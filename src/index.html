@@ -1,13 +1,194 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MP1</title>
-    </head>
-    <body>
-        <h1>Hello World! Welcome to MP1!</h1>
-        <img src="assets/image.jpg">
-    </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kanish Godani Portfolio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="./css/main.scss" />
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="site-header">
+    <div class="container">
+      <a href="#" class="brand reveal" data-delay="0ms">Kanish Godani's Portfolio</a>
+      <nav class="nav">
+        <a href="#home"     class="reveal" data-delay="40ms">Home</a>
+        <a href="#education"class="reveal" data-delay="160ms">Education</a>
+        <a href="#workexp"  class="reveal" data-delay="80ms">Work Exp</a>
+        <a href="#projects"     class="reveal" data-delay="200ms">Projects</a>
+        <a href="#skills" class="reveal" data-delay="120ms">Skills</a>
+        <a href="#interest"     class="reveal" data-delay="240ms">Interests</a>
+        <a href="#about"    class="reveal" data-delay="280ms">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Home Section -->
+    <section id="home" class="contentsection stripe--accent">
+      <div class="container">
+        <h1 class="reveal" data-delay="0ms">Kanish Godani</h1>
+        <p class="lead reveal" data-delay="120ms">Hello, I'm Kanish Godani, graduate Information Management student at University of Illinois Urbana-Champaign</p>
+        <p class="lead reveal" data-delay="120ms">Data Scientist • Data Analyst • Problem Solver</p>
+      </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="contentsection stripe--bg-fixed">
+      <div class="container">
+        <h2 class="reveal" data-delay="0ms">Current Education</h2>
+        <p class="reveal" data-delay="120ms">University of Illinois Urbana-Champaing</p>
+        <p class="reveal" data-delay="120ms">Master of Science in Information Management</p>
+      </div>
+    </section>
+
+    <!-- Work Experience Carousel Section -->
+    <section id="workexp" class="carousel-section" aria-label="Image carousel">
+      <div class="carousel">
+        <button class="carousel__arrow carousel__arrow--prev" type="button" aria-label="Previous">❮</button>
+        <div class="carousel__viewport">
+          <div class="carousel__track">
+            <figure class="carousel__slide">
+              <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=512,fit=crop,trim=315;0;315;0/dOqDgGOojPuNDZDq/untitled-design.png-m7VDN7awNWuabZv2.PNG" alt="Slide 1" />
+              <figcaption class="reveal" data-delay="0ms">Second Wind Pro - Data Science Intern</figcaption>
+            </figure>
+            <figure class="carousel__slide">
+              <img src="https://i.ytimg.com/vi/ESxLW8ha1SQ/maxresdefault.jpg" alt="Slide 2" />
+              <figcaption class="reveal" data-delay="0ms">Illinois Business Consulting - Consultant</figcaption>
+            </figure>
+            <figure class="carousel__slide">
+              <img src="https://www.symbo.co/wp-content/uploads/2024/01/Symbo_Insurance_Logo_Embedded_Insurance.png" alt="Slide 3" />
+              <figcaption class="reveal" data-delay="0ms">Symbo SouthAisa - Data Analyst Intern</figcaption>
+            </figure>
+          </div>
+        </div>
+        <button class="carousel__arrow carousel__arrow--next" type="button" aria-label="Next">❯</button>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="contentsection">
+      <div class="container">
+        <h2 class="reveal" data-delay="0ms">Projects</h2>
+        <div class="work-grid">
+          <button class="work-card reveal" data-delay="0ms"   data-modal="modal-1" aria-haspopup="dialog">
+            <img src="https://alldaymedicalcare.com/wp-content/uploads/2024/08/mental-health-2-1.jpg" alt="Project 1 thumbnail" />
+            <span class="work-card__label">Exploratory Analysis and Visualization of Music's Impact on Mental Health</span>
+          </button>
+          <button class="work-card reveal" data-delay="60ms"  data-modal="modal-2" aria-haspopup="dialog">
+            <img src="https://www.hfmmagazine.com/sites/default/files/hfmmagazine/ext/resources/images/2023/Magazine/September/HFM_September2023_Upfront_09_700x468.jpg" alt="Project 2 thumbnail" />
+            <span class="work-card__label">Operational Analytics and Forecasting for Multi-Facility Optimization</span>
+          </button>
+          <button class="work-card reveal" data-delay="120ms" data-modal="modal-3" aria-haspopup="dialog">
+            <img src="https://planonsoftware.com/upload_mm/4/7/1/4719_fullimage_20210309-image-dataanalytics-magnifieroverview-high-3000x1987.jpg" alt="Project 3 thumbnail" />
+            <span class="work-card__label">Prediction of Job Applications based on LinkedIn Data</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Project Modals Section -->
+  <div id="modal-1" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-1-title" hidden>
+    <div class="modal__dialog">
+      <button class="modal__close" aria-label="Close">×</button>
+      <h3 id="modal-1-title">Exploratory Analysis and Visualization of Music's Impact on Mental Health</h3>
+      <img src="https://alldaymedicalcare.com/wp-content/uploads/2024/08/mental-health-2-1.jpg" alt="" />
+      <p>Project on analysis of Music on Mental Health.</p>
+    </div>
+  </div>
+
+  <div id="modal-2" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-2-title" hidden>
+    <div class="modal__dialog">
+      <button class="modal__close" aria-label="Close">×</button>
+      <h3 id="modal-2-title">Operational Analytics and Forecasting for Multi-Facility Optimization</h3>
+      <img src="https://www.hfmmagazine.com/sites/default/files/hfmmagazine/ext/resources/images/2023/Magazine/September/HFM_September2023_Upfront_09_700x468.jpg" alt="" />
+      <p>Project on analysis of multi-facility operations and forecasting.</p>
+    </div>
+  </div>
+
+  <div id="modal-3" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-3-title" hidden>
+    <div class="modal__dialog">
+      <button class="modal__close" aria-label="Close">×</button>
+      <h3 id="modal-3-title">Prediction of Job Applications based on LinkedIn Data</h3>
+      <img src="https://planonsoftware.com/upload_mm/4/7/1/4719_fullimage_20210309-image-dataanalytics-magnifieroverview-high-3000x1987.jpg" alt="" />
+      <p>Project on prediction number of applications a linkedin job posting would receive.</p>
+    </div>
+  </div>
+
+    <!-- Multi-column Skills Section -->
+    <section id="skills" class="contentsection">
+      <div class="container features">
+        <article class="feature reveal" data-delay="0ms">
+          <span class="feature__icon" aria-hidden="true">
+            <i class="fa-solid fa-file"></i>
+          </span>
+          <h3>Programming Languages</h3>
+          <p>Python, R, SQL, Java, C++, HTML, CSS, Javascript</p>
+        </article>
+
+        <article class="feature reveal" data-delay="100ms">
+          <span class="feature__icon" aria-hidden="true">
+            <i class="fa-regular fa-rocket"></i>
+          </span>
+          <h3>Developer Tools</h3>
+          <p>Power BI, Tableau, Microsoft Excel (VBA, Macros), Looker Studio, Jupyter Notebook, Git</p>
+        </article>
+
+        <article class="feature reveal" data-delay="200ms">
+          <span class="feature__icon" aria-hidden="true">
+            <i class="fa-solid fa-cloud"></i>
+          </span>
+          <h3>Cloud & Databases</h3>
+          <p>MySQL, PostgreSQL, MongoDB, Snowflake, AWS (S3, Lambda, Redshift), GCP BigQuery</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Interest (video) Section -->
+    <section id="interest" class="contentsection video-hero" aria-label="Background video">
+      <div class="video-hero__media" aria-hidden="true">
+        <video
+          class="video-hero__video"
+          src="https://media.istockphoto.com/id/1065372876/video/photographer-at-working.mp4?s=mp4-640x640-is&k=20&c=YW0BoEiathnL3l1Q174yjCd2Jv9JkFmQ4AJ3nQUCbdQ="
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+        <span class="video-hero__scrim"></span>
+      </div>
+      <div class="video-hero__content container reveal" data-delay="0ms">
+        <h2>Photography</h2>
+        <p class="lead">I am extremely passionate about photography and consider it an art for depicting a story.</p>
+      </div>
+    </section>
+
+    <!-- About Me Section -->
+    <section id="about" class="contentsection stripe--accent vcenter">
+      <div class="container">
+        <h2 class="reveal" data-delay="0ms">About Me</h2>
+        <p class="reveal" data-delay="120ms">I am a 23 year old graduate student who is pursuing Master's degree in Information Management. I hope to become a Data Scientist with passion for solving business problems using data.</p>
+      </div>
+    </section>
+
+  <footer class="site-footer">
+    <div class="container footer-cols">
+      <div>© Kanish Godani</div>
+
+      <!-- Social icons Section-->
+      <div class="social">
+        <a href="https://www.linkedin.com/in/kanish-godani/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+          <i class="fa-brands fa-linkedin"></i>
+        </a>
+        <a href="https://github.com/kanish26" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+          <i class="fa-brands fa-github"></i>
+        </a>
+      </div>
+
+    </div>
+  </footer>
+
+  <script src="./js/main.js" defer></script>
+</body>
 </html>
