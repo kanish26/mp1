@@ -36,7 +36,7 @@ function smoothTo(hash) {
 
 
   const headH = parseFloat(getComputedStyle(topbar).height);
-  const y = target.getBoundingClientRect().top + window.scrollY - headH - 8;
+  const y = target.getBoundingClientRect().top + window.scrollY - headH;
 
   window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
 }
