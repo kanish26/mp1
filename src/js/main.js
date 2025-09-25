@@ -1,171 +1,285 @@
-/* Navbar shrinking on scroll and adjusting page offset */
-const header = document.querySelector('.site-header');
+/* Get topbar element (sticky header) */
+const topbar = document.querySelector('.topbar');
 
-function applyBodyOffset(height) {
-  document.body.style.paddingTop = `${height}px`;
+/* Apply body top padding to match topbar height */
+function setBodyOffset(px) {
+  document.body.style.paddingTop = `${px}px`;
 }
-function updateHeaderSize() {
-  const shrink = window.scrollY > 10;
-  header.classList.toggle('shrink', shrink);
-  applyBodyOffset(shrink ? 56 : 88);
-}
-window.addEventListener('scroll', updateHeaderSize, { passive: true });
-window.addEventListener('load', updateHeaderSize);
-updateHeaderSize();
 
-/*  Smooth scrolling */
-const navLinks = [...document.querySelectorAll('.nav a')];
-function smoothScrollTo(target) {
-  const headerH = header.classList.contains('shrink') ? 56 : 88;
-  const el = document.querySelector(target);
-  if (!el) return;
-  const targetTop = el.getBoundingClientRect().top + window.scrollY;
-  const top = Math.max(0, targetTop - headerH - 8);
-  window.scrollTo({ top, behavior: 'smooth' });
+/* Resize topbar on scroll and update body offset */
+function updateTopbar() {
+  // Determine compact state based on scroll distance
+  const compact = window.scrollY > 10;
+
+  // Toggle compact class
+  topbar.classList.toggle('is-compact', compact);
+
+  // Read computed height and set body padding
+  const h = parseFloat(getComputedStyle(topbar).height);
+  setBodyOffset(isNaN(h) ? 100 : h);
 }
+
+addEventListener('scroll', updateTopbar, { passive: true });
+addEventListener('load',   updateTopbar);
+
+updateTopbar();
+
+
+/* Collect nav links for smooth scroll + active highlight */
+const navLinks = Array.from(document.querySelectorAll('.navlist a'));
+
+
+/* Smoothly scroll to hash target accounting for sticky header */
+function smoothTo(hash) {
+  const target = document.querySelector(hash);
+  if (!target) return;
+
+
+  const headH = parseFloat(getComputedStyle(topbar).height);
+  const y = target.getBoundingClientRect().top + window.scrollY - headH - 8;
+
+  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+}
+
+
+/* Attach click handlers to nav links (prevent default jump) */
 navLinks.forEach(a => {
   a.addEventListener('click', e => {
     const href = a.getAttribute('href');
+
+    // Only handle in-page anchors
     if (href && href.startsWith('#')) {
       e.preventDefault();
-      smoothScrollTo(href);
-      history.pushState(null, '', href);
+      smoothTo(href);                  
+      history.pushState(null, '', href); 
     }
   });
 });
 
-/*  Carousel */
-(function initCarousel(){
-  const carousel = document.querySelector('.carousel');
-  if (!carousel) return;
 
-  const track = carousel.querySelector('.carousel__track');
-  const slides = [...carousel.querySelectorAll('.carousel__slide')];
-  const prevBtn = carousel.querySelector('.carousel__arrow--prev');
-  const nextBtn = carousel.querySelector('.carousel__arrow--next');
+/* Initialize image carousel (glider) */
+(function initGlider(){
+  // Root element for the glider
+  const glider = document.querySelector('[data-glide]');
+  if (!glider) return;
 
-  let index = 0;
-  const clamp = i => Math.max(0, Math.min(i, slides.length - 1));
+  // Key parts of the carousel
+  const track = glider.querySelector('.track');
+  const panes = Array.from(glider.querySelectorAll('.pane'));
+  const prev  = glider.querySelector('.arrow--prev');
+  const next  = glider.querySelector('.arrow--next');
 
-  function goTo(i) {
-    index = clamp(i);
-    track.style.transform = `translateX(${-index * 100}%)`;
-    prevBtn.disabled = index === 0;
-    nextBtn.disabled = index === slides.length - 1;
-    prevBtn.setAttribute('aria-disabled', String(prevBtn.disabled));
-    nextBtn.setAttribute('aria-disabled', String(nextBtn.disabled));
+  // Current slide index
+  let idx = 0;
+
+  // Clamp helper to keep index in range
+  const clamp = i => Math.max(0, Math.min(i, panes.length - 1));
+
+  // Go to a specific slide
+  function go(i) {
+    idx = clamp(i);
+
+    // Translate track by 100% per index
+    track.style.transform = `translateX(${-idx * 100}%)`;
+
+    // Enable/disable arrows for ends
+    const atFirst = idx === 0;
+    const atLast  = idx === panes.length - 1;
+
+    prev.disabled = atFirst;
+    next.disabled = atLast;
+
+    prev.setAttribute('aria-disabled', String(atFirst));
+    next.setAttribute('aria-disabled', String(atLast));
   }
 
-  prevBtn.addEventListener('click', () => goTo(index - 1));
-  nextBtn.addEventListener('click', () => goTo(index + 1));
-  window.addEventListener('resize', () => goTo(index));
-  goTo(0);
+  // Click handlers for arrows
+  prev.addEventListener('click', () => go(idx - 1));
+  next.addEventListener('click', () => go(idx + 1));
+
+  // Re-apply position on resize (avoid fractional rounding issues)
+  addEventListener('resize', () => go(idx));
+
+  // Start at first slide
+  go(0);
 })();
 
-/* Position indication */
-const sections = navLinks.map(a => document.querySelector(a.hash)).filter(Boolean);
-function setActiveIndex(i) {
-  navLinks.forEach((a, idx) => a.classList.toggle('is-active', idx === i));
+
+/* Active nav link: highlight band directly under header bottom */
+const bands = navLinks
+  .map(a => document.querySelector(a.getAttribute('href')))  
+  .filter(Boolean);                                          
+
+
+
+function setActive(i) {
+  navLinks.forEach((a, k) => a.classList.toggle('is-current', k === i));
 }
+
+
+/* Update which nav link is active based on scroll position */
 function updateActive() {
-  const headerH = header.classList.contains('shrink') ? 56 : 88;
-  const y = window.scrollY + headerH + 1;
-  let i = 0;
-  for (let k = 0; k < sections.length; k++) {
-    if (y >= sections[k].offsetTop) i = k; else break;
+  // Compute vertical position just below sticky header
+  const navBottom = topbar.getBoundingClientRect().bottom + window.scrollY;
+
+  // Walk sections in order, pick last whose top is <= header bottom
+  let current = 0;
+  for (let k = 0; k < bands.length; k++) {
+    if (bands[k].offsetTop <= navBottom + 1) current = k;
+    else break;
   }
-  const atBottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight;
-  if (atBottom) i = sections.length - 1;
-  setActiveIndex(i);
+
+  // If scrolled to absolute page bottom, force last section active
+  const atPageBottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight;
+  if (atPageBottom) current = bands.length - 1;
+
+  // Apply highlight
+  setActive(current);
 }
-document.addEventListener('scroll', () => requestAnimationFrame(updateActive), { passive: true });
-window.addEventListener('load', updateActive);
+
+
+/* Bind scroll + load events for active link updates */
+addEventListener('scroll', () => requestAnimationFrame(updateActive), { passive: true });
+addEventListener('load',   updateActive);
+
+// Initialize immediately
 updateActive();
 
-/* Modals */
-(function initModals() {
-  const openers = Array.from(document.querySelectorAll('[data-modal]'));
+
+/* Modal (lightbox) behavior with focus trap */
+(function modalize() {
+  // All openers with [data-modal] attribute
+  const triggers = Array.from(document.querySelectorAll('[data-modal]'));
+
+  // Document body (for scroll locking)
   const body = document.body;
 
-  function getModal(id) { return document.getElementById(id); }
+  // Helper to get element by ID
+  const byId = id => document.getElementById(id);
 
-  function trapFocus(modal) {
-    const focusables = modal.querySelectorAll(
-      'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
-    );
-    if (!focusables.length) return { first: null, last: null };
-    return { first: focusables[0], last: focusables[focusables.length - 1] };
-  }
+  // Query focusable elements inside a scope
+  const focusables = scope =>
+    scope.querySelectorAll('a,button,input,textarea,select,[tabindex]:not([tabindex="-1"])');
 
-  function openModal(id, openerSelector) {
-    const modal = getModal(id);
-    if (!modal) return;
-    modal.hidden = false;
-    body.classList.add('no-scroll');
-    if (openerSelector) modal.dataset.opener = openerSelector;
+  // Open modal by id, remember opener selector for focus return
+  function openModal(id, openerSel) {
+    const m = byId(id);
+    if (!m) return;
 
-    const { first } = trapFocus(modal);
-    (first || modal).focus({ preventScroll: true });
+    // Show modal and lock body scroll
+    m.hidden = false;
+    body.classList.add('-noscroll');
 
+    // Save opener selector for later focus restoration
+    if (openerSel) m.dataset.opener = openerSel;
+
+    // Move initial focus
+    const list = focusables(m);
+    (list[0] || m).focus({ preventScroll: true });
+
+    // Key handling (Esc to close, Tab to trap)
     function onKey(e) {
-      if (e.key === 'Escape') closeModal(modal);
+      if (e.key === 'Escape') closeModal(m);
+
       if (e.key === 'Tab') {
-        const { first, last } = trapFocus(modal);
-        if (!first) return;
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        if (!list.length) return;
+
+        const first = list[0];
+        const last  = list[list.length - 1];
+
+        // Loop focus within modal
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     }
-    modal.addEventListener('keydown', onKey);
-    modal._onKey = onKey;
 
-    modal.addEventListener('mousedown', e => { if (e.target === modal) closeModal(modal); });
+    // Bind keydown + backdrop click to close
+    m.addEventListener('keydown', onKey);
+    m._onKey = onKey;
+
+    m.addEventListener('mousedown', e => {
+      if (e.target === m) closeModal(m);  // Click on overlay closes
+    });
   }
 
-  function closeModal(modal) {
-    modal.hidden = true;
-    document.body.classList.remove('no-scroll');
-    modal.removeEventListener('keydown', modal._onKey || (()=>{}));
-    const openerSel = modal.dataset.opener;
-    if (openerSel) document.querySelector(openerSel)?.focus();
+  // Close modal and restore focus to opener (if any)
+  function closeModal(m) {
+    m.hidden = true;
+    body.classList.remove('-noscroll');
+
+    // Remove listener
+    m.removeEventListener('keydown', m._onKey || (() => {}));
+
+    // Restore focus to the opener button
+    const opener = m.dataset.opener;
+    if (opener) document.querySelector(opener)?.focus();
   }
 
-  openers.forEach(btn => {
+  // Wire up modal openers
+  triggers.forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.getAttribute('data-modal');
-      btn.setAttribute('data-modal-opener', '1');
-      openModal(id, '[data-modal-opener="1"]');
-      setTimeout(() => btn.removeAttribute('data-modal-opener'), 0);
+
+      // Mark this button as the opener (selector) for later focus return
+      btn.setAttribute('data-opener', '1');
+
+      // Open modal and pass a selector to re-focus after close
+      openModal(id, '[data-opener="1"]');
+
+      // Remove marker in next frame (avoid keeping attribute)
+      setTimeout(() => btn.removeAttribute('data-opener'), 0);
     });
   });
 
-  document.querySelectorAll('.modal__close').forEach(x =>
-    x.addEventListener('click', () => closeModal(x.closest('.modal')))
-  );
+  // Wire up modal close buttons
+  document
+    .querySelectorAll('.modalbox__close')
+    .forEach(x => x.addEventListener('click', () => closeModal(x.closest('.modalbox'))));
 })();
 
-/* Reveal on scrolling */
+
+/* Reveal-on-scroll animation using IntersectionObserver */
 (function revealOnScroll() {
-  const items = Array.from(document.querySelectorAll('.reveal'));
-  if (!items.length || 'IntersectionObserver' in window === false) {
-    items.forEach(el => el.classList.add('in-view'));
+  // All elements that should reveal
+  const els = Array.from(document.querySelectorAll('.revealix'));
+
+  // Fallback: if no IO support, just show everything
+  if (!els.length || !('IntersectionObserver' in window)) {
+    els.forEach(el => el.classList.add('in'));
     return;
   }
+
+  // Observer callback: add class when in view
   const io = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const el = entry.target;
-        const delay = el.getAttribute('data-delay') || '0ms';
-        el.style.setProperty('--reveal-delay', delay);
-        el.classList.add('in-view');
+
+        // Use per-element delay variable
+        const delay = el.getAttribute('data-rx-delay') || '0ms';
+        el.style.setProperty('--rx-delay', delay);
+
+        // Trigger animation
+        el.classList.add('in');
+
+        // Stop observing once revealed
         io.unobserve(el);
       }
     });
-  }, { threshold: 0.16 });
+  }, { threshold: 0.16 }); // ~16% visibility threshold
 
-/*  Footer */
-const yEl = document.getElementById('year');
-if (yEl) yEl.textContent = new Date().getFullYear();
-
-  items.forEach(el => io.observe(el));
+  // Observe each target
+  els.forEach(el => io.observe(el));
 })();
+
+
+/* Footer: current year injection */
+const yearEl = document.getElementById('year');
+if (yearEl) {
+  yearEl.textContent = new Date().getFullYear(); // Set to current year
+}
